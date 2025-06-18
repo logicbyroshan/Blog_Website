@@ -1,8 +1,8 @@
 import os
+import dj_database_url # <--- Import this
 from pathlib import Path
-import sys
 import dotenv
-import dj_database_url
+
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -10,7 +10,7 @@ dotenv_path = os.path.join(BASE_DIR, '.env')
 dotenv.load_dotenv(dotenv_path)
 
 
-SECRET_KEY = 'SECRET_KEY'
+SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-secret-key')
 DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
 ALLOWED_HOSTS = ['*']
 
@@ -30,8 +30,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -39,7 +39,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 ROOT_URLCONF = 'config.urls'
@@ -68,9 +67,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        conn_max_age=600
+    )
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -106,16 +107,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+# --- UPDATE STATIC FILES CONFIGURATION ---
+STATIC_URL = 'static/'
+# This tells Django to copy all static files into one directory during deployment.
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# Add this line to ensure WhiteNoise can find your static files.
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-
-
-# Media files (User-uploaded content)
-# https://docs.djangoproject.com/en/5.2/topics/files/
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
