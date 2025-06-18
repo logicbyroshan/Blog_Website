@@ -1,13 +1,15 @@
 import os
 from pathlib import Path
+import sys
+import dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+dotenv_path = os.path.join(BASE_DIR, '.env')
+dotenv.load_dotenv(dotenv_path)
 
-SECRET_KEY = 'django-insecure-sqqnn^^k*a+&8*h(&%6nz69jjm-d(3shrnz2o1v(m9)hbascu!'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+SECRET_KEY = 'SECRET_KEY'
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
 ALLOWED_HOSTS = []
 
 
@@ -21,6 +23,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'admin_app',
+    'blog_app',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -45,6 +49,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'blog_app.context_processors.user_context', 
+
             ],
         },
     },
@@ -113,3 +119,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'server95-90.liteserverdns.in'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True         # ✅ SSL because port 462
+EMAIL_USE_TLS = False        # ✅ Must be False when using SSL
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')         # ✅ or use plain string email
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD') # ✅ or use plain string password
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+

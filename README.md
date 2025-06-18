@@ -169,3 +169,4 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 - [Tailwind CSS](https://tailwindcss.com/)
 - [TinyMCE](https://www.tiny.cloud/)
 - OpenAI for AI inspiration
+- AI Studio for Code Genration
