@@ -70,13 +70,18 @@ def blog_list_view(request):
 
 def blog_detail_view(request, slug):
     """
-    Renders the detail page for a single blog post.
+    View for a single blog post.
     """
-
-    # Retrieve the post or return a 404 error if not found/not published
     post = get_object_or_404(Post, slug=slug, is_active=True, status=Post.Status.PUBLISHED)
     
-    # Find related posts based on shared tags
+    # --- ADD THIS LOGIC ---
+    # Build the full, absolute URL for the thumbnail for SEO/OG tags
+    thumbnail_url = None
+    if post.thumbnail:
+        thumbnail_url = request.build_absolute_uri(post.thumbnail.url)
+    # --- END ADDITION ---
+    
+    # "You Might Also Like" section: find posts with shared tags
     post_tags_ids = post.tags.values_list('id', flat=True)
     related_posts = Post.objects.filter(tags__in=post_tags_ids)\
                                 .exclude(id=post.id)\
@@ -87,6 +92,7 @@ def blog_detail_view(request, slug):
     context = {
         'post': post,
         'related_posts': related_posts,
+        'og_image_url': thumbnail_url, # Pass the full URL to the template
     }
     return render(request, 'blog_app/blog_dtl.html', context)
 

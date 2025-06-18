@@ -9,11 +9,15 @@
     <meta name="author" content="{{ post.author.get_full_name|default:post.author.username }}">
     <meta property="og:title" content="{{ post.title }}">
     <meta property="og:description" content="{{ post.meta_description|default:post.subtitle }}">
-    {% if post.thumbnail %}
-    <meta property="og:image" content="{{ request.build_absolute_uri(post.thumbnail.url) }}">
+    
+    <!-- FIX THIS SECTION -->
+    {% if og_image_url %}
+    <meta property="og:image" content="{{ og_image_url }}">
     {% endif %}
+    
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
     <meta property="og:type" content="article">
+    <!-- END FIX -->
 {% endblock %}
 
 {% block page_css %}
